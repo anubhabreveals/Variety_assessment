@@ -1,30 +1,30 @@
 from pathlib import Path
 
 import PySimpleGUI as sg
+from openpyxl import load_workbook
 import pandas as pd
 
 # Add some color to the window
 sg.theme('DarkTeal9')
 
-current_dir = Path(__file__).parent if '__file__' in locals() else Path.cwd()
-EXCEL_FILE = current_dir / 'Data_Entry.xlsx'
+EXCEL_FILE = 'Data_Entry.xlsx'
 df = pd.read_excel(EXCEL_FILE)
+
+
 
 layout = [
     [sg.Text('Please fill out the following fields:')],
-    [sg.Text('Name', size=(15,1)), sg.InputText(key='Name')],
-    [sg.Text('City', size=(15,1)), sg.InputText(key='City')],
-    [sg.Text('Favorite Colour', size=(15,1)), sg.Combo(['Green', 'Blue', 'Red'], key='Favorite Colour')],
-    [sg.Text('I speak', size=(15,1)),
-                            sg.Checkbox('German', key='German'),
-                            sg.Checkbox('Spanish', key='Spanish'),
-                            sg.Checkbox('English', key='English')],
-    [sg.Text('No. of Children', size=(15,1)), sg.Spin([i for i in range(0,16)],
-                                                       initial_value=0, key='Children')],
-    [sg.Submit(), sg.Button('Clear'), sg.Exit()]
+    [sg.Text('Action', size=(15,1)), sg.InputText(key='Action')],
+    [sg.Text('State Change', size=(15,1)), sg.InputText(key='State Change')],
+    [sg.Text('Phenomena', size=(15,1)), sg.InputText(key='Phenomena')],
+    [sg.Text('Physical effect', size=(15,1)), sg.InputText(key='Physical effect')],
+    [sg.Text('oRgan', size=(15,1)), sg.InputText(key='oRgan')],
+    [sg.Text('Part', size=(15,1)), sg.InputText(key='Part')],
+    [sg.Text('Input', size=(15,1)), sg.InputText(key='Input')],
+    [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate')]
 ]
 
-window = sg.Window('Simple data entry form', layout)
+window = sg.Window('Idea Variety', layout)
 
 def clear_input():
     for key in values:
@@ -44,4 +44,11 @@ while True:
         df.to_excel(EXCEL_FILE, index=False)
         sg.popup('Data saved!')
         clear_input()
+    if event == 'Calculate':
+        wb = load_workbook('data_Entry.xlsx')
+        ws = wb.active
+        column_action = ws['A']
+        for cell in column_action:
+            print(cell.value)
+
 window.close()
