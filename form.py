@@ -52,44 +52,62 @@ while True:
         sg.popup('Data saved!')
         clear_input()
     if event == 'Calculate':
-        i=1
-        j=2
-        num_i = 'Concept '+str(i)
-        num_j = 'Concept '+str(j)
-        df_new_i = df[df['Concept ID'] == num_i]
-        df_new_j = df[df['Concept ID'] == num_j]
+        concept_list = list(df['Concept ID'])
+        total_num_of_concepts = len(remove_duplicates(concept_list))
+        n = total_num_of_concepts + 1
+        d_ij_list = []
+        for i in range(1,n):
+            for j in range(1,n):
+                if i != j:
+                    num_i = 'Concept '+str(i)
+                    num_j = 'Concept '+str(j)
+                    df_new_i = df[df['Concept ID'] == num_i]
+                    df_new_j = df[df['Concept ID'] == num_j]
 
-        list_a = list(df_new_i['Action']) + list(df_new_j['Action'])
-        u_a = len(remove_duplicates(list_a))
-        n_a = len(list_a)
+                    list_a = list(df_new_i['Action']) + list(df_new_j['Action'])
+                    u_a = len(remove_duplicates(list_a))
+                    n_a = len(list_a)
 
-        list_s = list(df_new_i['State Change']) + list(df_new_j['State Change'])
-        u_s = len(remove_duplicates(list_s))
-        n_s = len(list_s)
+                    list_s = list(df_new_i['State Change']) + list(df_new_j['State Change'])
+                    u_s = len(remove_duplicates(list_s))
+                    n_s = len(list_s)
 
-        list_ph = list(df_new_i['Phenomena']) + list(df_new_j['Phenomena'])
-        u_ph = len(remove_duplicates(list_ph))
-        n_ph = len(list_ph)
+                    list_ph = list(df_new_i['Phenomena']) + list(df_new_j['Phenomena'])
+                    u_ph = len(remove_duplicates(list_ph))
+                    n_ph = len(list_ph)
 
-        list_e = list(df_new_i['Physical effect']) + list(df_new_j['Physical effect'])
-        u_e = len(remove_duplicates(list_e))
-        n_e = len(list_e)
+                    list_e = list(df_new_i['Physical effect']) + list(df_new_j['Physical effect'])
+                    u_e = len(remove_duplicates(list_e))
+                    n_e = len(list_e)
 
-        list_r = list(df_new_i['oRgan']) + list(df_new_j['oRgan'])
-        u_r = len(remove_duplicates(list_r))
-        n_r = len(list_r)
+                    list_r = list(df_new_i['oRgan']) + list(df_new_j['oRgan'])
+                    u_r = len(remove_duplicates(list_r))
+                    n_r = len(list_r)
 
-        list_p = list(df_new_i['Part']) + list(df_new_j['Part'])
-        u_p = len(remove_duplicates(list_p))
-        n_p = len(list_p)
+                    list_p = list(df_new_i['Part']) + list(df_new_j['Part'])
+                    u_p = len(remove_duplicates(list_p))
+                    n_p = len(list_p)
 
-        list_i = list(df_new_i['Input']) + list(df_new_j['Input'])
-        u_i = len(remove_duplicates(list_i))
-        n_i = len(list_i)
+                    list_i = list(df_new_i['Input']) + list(df_new_j['Input'])
+                    u_i = len(remove_duplicates(list_i))
+                    n_i = len(list_i)
 
+                    d_ij = ((u_a/n_a)+(u_s/n_s)+(u_ph/n_ph)+(u_e/n_e)+(u_r/n_r)+(u_p/n_p)+(u_i/n_i))/7
 
-        print(u_a,n_a)
-        print(df_new_i)
-        print(df_new_j)
+                    print(i,j)
+                    print(u_a,n_a)
+                    print(d_ij)
+                    print(df_new_i)
+                    print(df_new_j)
+                    d_ij_list.append(d_ij)
+                else:
+                    d_ij = 0
+                    d_ij_list.append(d_ij)
+        print(d_ij_list) 
+        m = []
+        while d_ij_list != []:
+            m.append(d_ij_list[:n-1])
+            d_ij_list = d_ij_list[n-1:]
+        print(m)          
 
 window.close()
