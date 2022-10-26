@@ -3,6 +3,7 @@ from pathlib import Path
 import PySimpleGUI as sg
 from openpyxl import load_workbook
 import pandas as pd
+import numpy as np
 
 # Add some color to the window
 sg.theme('DarkTeal9')
@@ -21,8 +22,10 @@ layout = [
     [sg.Text('oRgan', size=(15,1)), sg.InputText(key='oRgan')],
     [sg.Text('Part', size=(15,1)), sg.InputText(key='Part')],
     [sg.Text('Input', size=(15,1)), sg.InputText(key='Input')],
-    [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate')]
+    [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate Variety'), sg.Button('Show Database')]
 ]
+
+# layout2 = [[sg.Multiline('', size=(80,10), key='database')]]
 
 window = sg.Window('Idea Variety', layout)
 
@@ -46,12 +49,15 @@ while True:
     if event == 'Clear':
         clear_input()
     if event == 'Submit':
-        new_record = pd.DataFrame(values, index=[0])
-        df = pd.concat([df, new_record], ignore_index=True)
-        df.to_excel(EXCEL_FILE, index=False)
-        sg.popup('Data saved!')
-        clear_input()
-    if event == 'Calculate':
+        if values['Concept ID']=='' or values['Action']=='' or values['State Change']=='' or values['Phenomena']=='' or values['Physical effect']=='' or values['oRgan']=='' or values['Part']=='' or values['Input']=='':
+            sg.popup('Please enter the data!')
+        else:
+            new_record = pd.DataFrame(values, index=[0])
+            df = pd.concat([df, new_record], ignore_index=True)
+            df.to_excel(EXCEL_FILE, index=False)
+            sg.popup('Data saved!')
+            clear_input()
+    if event == 'Calculate Variety':
         concept_list = list(df['Concept ID'])
         total_num_of_concepts = len(remove_duplicates(concept_list))
         n = total_num_of_concepts + 1
@@ -94,20 +100,34 @@ while True:
 
                     d_ij = ((u_a/n_a)+(u_s/n_s)+(u_ph/n_ph)+(u_e/n_e)+(u_r/n_r)+(u_p/n_p)+(u_i/n_i))/7
 
-                    print(i,j)
-                    print(u_a,n_a)
-                    print(d_ij)
-                    print(df_new_i)
-                    print(df_new_j)
-                    d_ij_list.append(d_ij)
+                   # print(i,j)
+                   # print(u_a,n_a)
+                   # print(d_ij)
+                   # print(df_new_i)
+                   # print(df_new_j)
+                    d_ij_list.append(round(d_ij, 4))
                 else:
                     d_ij = 0
-                    d_ij_list.append(d_ij)
-        print(d_ij_list) 
-        m = []
+                    d_ij_list.append(round(d_ij, 4))
+     
+        d_ij_matrix = []
         while d_ij_list != []:
-            m.append(d_ij_list[:n-1])
+            d_ij_matrix.append(d_ij_list[:n-1])
             d_ij_list = d_ij_list[n-1:]
-        print(m)          
-
+        
+        d_ij_matrix = np.array(d_ij_matrix)
+        d_ij_sum = d_ij_matrix.sum(axis = 1)  
+        for line in d_ij_matrix:
+            print ('  '.join(map(str, line)))
+        v_i_list = []
+        for i in range(1,n):
+            v_i = (d_ij_sum[i-1])/(n-2)
+            v_i_list.append(v_i)
+            text_print_1 = 'V['+str(i)+'] = '+str(round(v_i, 4)) 
+            print(text_print_1)
+        v_cs = (sum(v_i_list))/(n-1)
+        sg.popup('Variety score of the solution space is: '+str(round(v_cs, 4)), title='Variety Score')
+        
+   # if event == 'Show Database':
+      #  window['database'].update(value=df)
 window.close()
