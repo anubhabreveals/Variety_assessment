@@ -1,4 +1,5 @@
 from pathlib import Path
+from tabulate import tabulate
 
 import PySimpleGUI as sg
 from openpyxl import load_workbook
@@ -22,7 +23,7 @@ layout = [
     [sg.Text('oRgan', size=(15,1)), sg.InputText(key='oRgan')],
     [sg.Text('Part', size=(15,1)), sg.InputText(key='Part')],
     [sg.Text('Input', size=(15,1)), sg.InputText(key='Input')],
-    [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate Variety'), sg.Button('Show Database')]
+    [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate Variety'), sg.Button('Show Database'), sg.Button('Clear Database')]
 ]
 
 # layout2 = [[sg.Multiline('', size=(80,10), key='database')]]
@@ -50,7 +51,7 @@ while True:
         clear_input()
     if event == 'Submit':
         if values['Concept ID']=='' or values['Action']=='' or values['State Change']=='' or values['Phenomena']=='' or values['Physical effect']=='' or values['oRgan']=='' or values['Part']=='' or values['Input']=='':
-            sg.popup('Please enter the data!')
+            sg.popup('All fields are required!')
         else:
             new_record = pd.DataFrame(values, index=[0])
             df = pd.concat([df, new_record], ignore_index=True)
@@ -128,6 +129,11 @@ while True:
         v_cs = (sum(v_i_list))/(n-1)
         sg.popup('Variety score of the solution space is: '+str(round(v_cs, 4)), title='Variety Score')
         
-   # if event == 'Show Database':
-      #  window['database'].update(value=df)
+    if event == 'Show Database':
+        print(tabulate(df, headers = 'keys', tablefmt = 'psql', showindex=False))
+        #sg.PopupScrolled(df, size=(80,10))
+    if event == 'Clear Database':
+        df.drop(df.index, inplace=True)
+        df.to_excel(EXCEL_FILE, index=False)
+        print(tabulate(df, headers = 'keys', tablefmt = 'psql', showindex=False))
 window.close()
