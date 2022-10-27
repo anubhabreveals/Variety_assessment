@@ -29,7 +29,24 @@ layout = [
 
 # layout2 = [[sg.Multiline('', size=(80,10), key='database')]]
 
-window = sg.Window('Idea Variety', layout)
+window = sg.Window('VariAnT v1.0', layout)
+
+def warning_window():
+    warning_layout = [[sg.Text('Do you really want to delete these records? \nThis process cannot be undone')],[sg.Button('Cancel'), sg.Button('Delete', button_color='red')]]
+
+    warning_window = sg.Window('', warning_layout, modal=True)
+    while True:
+        event, values = warning_window.read()
+        if event == sg.WIN_CLOSED or event == 'Cancel':
+            break
+        if event == 'Delete':
+            df.drop(df.index, inplace=True)
+            df.to_excel(EXCEL_FILE, index=False)
+            print(tabulate(df, headers = 'keys', tablefmt = 'psql', showindex=False))
+            sg.Popup('Done!')
+            break
+            
+    warning_window.close()
 
 def database_window():
     headings = ['Concept ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input']
@@ -50,6 +67,12 @@ def clear_input():
     for key in values:
         window[key]('')
     return None
+
+def n_k_minus_s_k(list1,list2):
+    union = set(list1).union(set(list2))
+    intersection = set(list1).intersection(set(list2))
+    n_k_min_s_k = len(list1)+len(list2)-2*len(intersection)
+    return n_k_min_s_k
 
 def remove_duplicates(duplist):
     noduplist = []
@@ -87,38 +110,52 @@ while True:
                     df_new_i = df[df['Concept ID'] == num_i]
                     df_new_j = df[df['Concept ID'] == num_j]
 
-                    list_a = list(df_new_i['Action']) + list(df_new_j['Action'])
-                    u_a = len(remove_duplicates(list_a))
+                    list_a_i = list(df_new_i['Action'])
+                    list_a_j = list(df_new_j['Action'])
+                    list_a = list_a_i + list_a_j
+                    u_a = n_k_minus_s_k(list_a_i,list_a_j)
                     n_a = len(list_a)
 
-                    list_s = list(df_new_i['State Change']) + list(df_new_j['State Change'])
-                    u_s = len(remove_duplicates(list_s))
+                    list_s_i = list(df_new_i['State Change'])
+                    list_s_j = list(df_new_j['State Change'])
+                    list_s = list_s_i + list_s_j
+                    u_s = n_k_minus_s_k(list_s_i,list_s_j)
                     n_s = len(list_s)
 
-                    list_ph = list(df_new_i['Phenomena']) + list(df_new_j['Phenomena'])
-                    u_ph = len(remove_duplicates(list_ph))
+                    list_ph_i = list(df_new_i['Phenomena'])
+                    list_ph_j = list(df_new_j['Phenomena'])
+                    list_ph = list_ph_i + list_ph_j
+                    u_ph = n_k_minus_s_k(list_ph_i,list_ph_j)
                     n_ph = len(list_ph)
 
-                    list_e = list(df_new_i['Physical effect']) + list(df_new_j['Physical effect'])
-                    u_e = len(remove_duplicates(list_e))
+                    list_e_i = list(df_new_i['Physical effect'])
+                    list_e_j = list(df_new_j['Physical effect'])
+                    list_e = list_e_i + list_e_j
+                    u_e = n_k_minus_s_k(list_e_i,list_e_j)
                     n_e = len(list_e)
 
-                    list_r = list(df_new_i['oRgan']) + list(df_new_j['oRgan'])
-                    u_r = len(remove_duplicates(list_r))
+                    list_r_i = list(df_new_i['oRgan'])
+                    list_r_j = list(df_new_j['oRgan'])
+                    list_r = list_r_i + list_r_j
+                    u_r = n_k_minus_s_k(list_r_i,list_r_j)
                     n_r = len(list_r)
 
-                    list_p = list(df_new_i['Part']) + list(df_new_j['Part'])
-                    u_p = len(remove_duplicates(list_p))
+                    list_p_i = list(df_new_i['Part'])
+                    list_p_j = list(df_new_j['Part'])
+                    list_p = list_p_i + list_p_j
+                    u_p = n_k_minus_s_k(list_p_i,list_p_j)
                     n_p = len(list_p)
 
-                    list_i = list(df_new_i['Input']) + list(df_new_j['Input'])
-                    u_i = len(remove_duplicates(list_i))
+                    list_i_i = list(df_new_i['Input'])
+                    list_i_j = list(df_new_j['Input'])
+                    list_i = list_i_i + list_i_j
+                    u_i = n_k_minus_s_k(list_i_i,list_i_j)
                     n_i = len(list_i)
 
                     d_ij = ((u_a/n_a)+(u_s/n_s)+(u_ph/n_ph)+(u_e/n_e)+(u_r/n_r)+(u_p/n_p)+(u_i/n_i))/7
 
-                   # print(i,j)
-                   # print(u_a,n_a)
+                    #print(i,j)
+                    #print(u_s,n_s)
                    # print(d_ij)
                    # print(df_new_i)
                    # print(df_new_j)
@@ -150,7 +187,5 @@ while True:
         #sg.PopupScrolled(df, size=(80,10))
         database_window()
     if event == 'Clear Database':
-        df.drop(df.index, inplace=True)
-        df.to_excel(EXCEL_FILE, index=False)
-        print(tabulate(df, headers = 'keys', tablefmt = 'psql', showindex=False))
+        warning_window()
 window.close()
