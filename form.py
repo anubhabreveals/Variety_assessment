@@ -10,6 +10,7 @@ import numpy as np
 sg.theme('DarkTeal9')
 
 
+
 EXCEL_FILE = 'Data_Entry.xlsx'
 df = pd.read_excel(EXCEL_FILE)
 
@@ -29,6 +30,21 @@ layout = [
 # layout2 = [[sg.Multiline('', size=(80,10), key='database')]]
 
 window = sg.Window('Idea Variety', layout)
+
+def database_window():
+    headings = ['Concept ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input']
+    df1=df.values.tolist()
+    database_layout = [[sg.Table(values = df1, headings = headings,
+    auto_size_columns=True, justification='left')]]
+
+    database_window = sg.Window('Database', database_layout, modal=True)
+    while True:
+        event, values = database_window.read()
+        if event == sg.WIN_CLOSED:
+            break
+    database_window.close()
+
+
 
 def clear_input():
     for key in values:
@@ -55,7 +71,7 @@ while True:
         else:
             new_record = pd.DataFrame(values, index=[0])
             df = pd.concat([df, new_record], ignore_index=True)
-            df.to_excel(EXCEL_FILE, index=False)
+            df.to_excel(EXCEL_FILE, columns=['Concept ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input'], index=False)
             sg.popup('Data saved!')
             clear_input()
     if event == 'Calculate Variety':
@@ -132,6 +148,7 @@ while True:
     if event == 'Show Database':
         print(tabulate(df, headers = 'keys', tablefmt = 'psql', showindex=False))
         #sg.PopupScrolled(df, size=(80,10))
+        database_window()
     if event == 'Clear Database':
         df.drop(df.index, inplace=True)
         df.to_excel(EXCEL_FILE, index=False)
