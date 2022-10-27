@@ -24,7 +24,7 @@ def calculate_window(x,y):
     for i in range(1,y+1):
         ins_id_list.append('Instance '+str(i))
     calculate_layout = [
-        [sg.Text('Please fill out the following fields:')],
+        [sg.Text('Please fill out the following fields:', text_color='yellow')],
         [sg.Text('Concept ID', size=(15,1)), sg.Combo(con_id_list, key='Concept ID'),sg.Text('Instance ID', size=(14,1)), sg.Combo(ins_id_list, key='Instance ID'),],
         [sg.Text('Action', size=(15,1)), sg.InputText(key='Action')],
         [sg.Text('State Change', size=(15,1)), sg.InputText(key='State Change')],
@@ -36,7 +36,7 @@ def calculate_window(x,y):
         [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate Variety'), sg.Button('Show Database'), sg.Button('Clear Database')]
     ]
 
-    calculate_window = sg.Window('VariAnT v1.0', calculate_layout)
+    calculate_window = sg.Window('VariAnT v1.0', calculate_layout, modal=True)
 
     def clear_input():
         for key in values:
@@ -72,6 +72,15 @@ def calculate_window(x,y):
                 break
         database_window.close()
 
+    def sapphire_window(a,s,ph,e,r,p,i):
+        sapphire_layout = [[sg.Text(a, justification='center', size=(50,1))],[sg.Text('↑', justification='center', size=(50,1))],[sg.Text(s, justification='center', size=(50,1))],[sg.Text('↑', justification='center', size=(50,1))],[sg.Text(ph, justification='center', size=(50,1))],[sg.Text('↑', justification='center', size=(50,1))],[sg.Text(e, justification='center', size=(50,1))],[sg.Text('↗', justification='right', size=(20,1)),sg.Text('', justification='center', size=(10,1)),sg.Text('↖', justification='left', size=(20,1))],[sg.Text(i, justification='center', size=(25,1)),sg.Text(r, justification='center', size=(25,1))],[sg.Text('', justification='center', size=(25,1)),sg.Text('↑', justification='center', size=(25,1))],[sg.Text('', justification='center', size=(25,1)),sg.Text(p, justification='center', size=(25,1))],[sg.Button('OK')]]
+        sapphire_window = sg.Window('SAPPhIRE Instance:', sapphire_layout, modal=True)
+        while True:
+            event, values = sapphire_window.read()
+            if event == sg.WIN_CLOSED or event == 'OK':
+                break
+        sapphire_window.close()
+
     def remove_duplicates(duplist):
         noduplist = []
         for element in duplist:
@@ -101,7 +110,7 @@ def calculate_window(x,y):
                 new_record = pd.DataFrame(values, index=[0])
                 df = pd.concat([df, new_record], ignore_index=True)
                 df.to_excel(EXCEL_FILE, columns=['Concept ID','Instance ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input'], index=False)
-                sg.popup('Data saved!')
+                sapphire_window(values['Action'],values['State Change'],values['Phenomena'],values['Physical effect'],values['oRgan'],values['Part'],values['Input'])
                 clear_input()
         if event == 'Calculate Variety':
             concept_list = list(df['Concept ID'])
