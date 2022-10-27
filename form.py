@@ -16,7 +16,6 @@ df = pd.read_excel(EXCEL_FILE)
 
 
 def calculate_window(x,y):
-    print(x,y)
     df = pd.read_excel(EXCEL_FILE)
     con_id_list = []
     ins_id_list = []
