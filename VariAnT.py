@@ -107,7 +107,8 @@ def calculate_window(x,y):
             if values['Concept ID']=='' or values['Instance ID']=='' or values['Action']=='' or values['State Change']=='' or values['Phenomena']=='' or values['Physical effect']=='' or values['oRgan']=='' or values['Part']=='' or values['Input']=='':
                 sg.popup('All fields are required!')
             else:
-                new_record = pd.DataFrame(values, index=[0])
+                d = {'Concept ID': values['Concept ID'],'Instance ID': values['Instance ID'],'Action': values['Action'],'State Change': values['State Change'],'Phenomena': values['Phenomena'],'Physical effect': values['Physical effect'],'oRgan': values['oRgan'],'Part': values['Part'],'Input': values['Input']}
+                new_record = pd.DataFrame(data=d, index=[0])
                 df = pd.concat([df, new_record], ignore_index=True)
                 df.to_excel(EXCEL_FILE, columns=['Concept ID','Instance ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input'], index=False)
                 sapphire_window(values['Action'],values['State Change'],values['Phenomena'],values['Physical effect'],values['oRgan'],values['Part'],values['Input'])
