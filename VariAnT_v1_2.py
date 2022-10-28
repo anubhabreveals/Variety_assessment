@@ -24,7 +24,7 @@ def create_bar_graph(y_axis, x_axis):
     plt.ylabel("Variety Score")
     plt.xticks(x_axis)
     for i in range(len(x_axis)):
-        plt.text(i+1, y_axis[i], y_axis[i], ha='center')
+        plt.text(i+1, y_axis[i], round(y_axis[i],3), ha='center')
     return plt.gcf()
 
 def draw_figure_on_canvas(canvas, figure):
