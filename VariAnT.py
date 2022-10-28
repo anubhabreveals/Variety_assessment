@@ -17,15 +17,16 @@ df = pd.read_excel(EXCEL_FILE)
 
 def calculate_window(x,y):
     df = pd.read_excel(EXCEL_FILE)
+    headings = ['Concept ID','Instance ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input']
+    df1= []
     con_id_list = []
     ins_id_list = []
     for i in range(1,x+1):
         con_id_list.append('Concept '+str(i))
     for i in range(1,y+1):
         ins_id_list.append('Instance '+str(i))
-    calculate_layout = [
-        [sg.Text('Please fill out the following fields:', text_color='yellow')],
-        [sg.Text('Concept ID', size=(15,1)), sg.Combo(con_id_list, key='Concept ID'),sg.Text('Instance ID', size=(14,1)), sg.Combo(ins_id_list, key='Instance ID'),],
+    column_1_layout = [[sg.Text('Please fill out the following fields:', text_color='yellow')],
+        [sg.Text('Concept ID', size=(15,1)), sg.Combo(con_id_list, key='Concept ID'),sg.Text('Instance ID', size=(14,1)), sg.Combo(ins_id_list, key='Instance ID')],
         [sg.Text('Action', size=(15,1)), sg.InputText(key='Action')],
         [sg.Text('State Change', size=(15,1)), sg.InputText(key='State Change')],
         [sg.Text('Phenomena', size=(15,1)), sg.InputText(key='Phenomena')],
@@ -33,14 +34,23 @@ def calculate_window(x,y):
         [sg.Text('oRgan', size=(15,1)), sg.InputText(key='oRgan')],
         [sg.Text('Part', size=(15,1)), sg.InputText(key='Part')],
         [sg.Text('Input', size=(15,1)), sg.InputText(key='Input')],
-        [sg.Submit(), sg.Button('Clear'), sg.Exit(), sg.Button('Calculate Variety'), sg.Button('Show Database'), sg.Button('Clear Database')]
-    ]
+        [sg.Submit(), sg.Button('Clear'), sg.Exit()],[sg.Button('Calculate Variety'), sg.Button('Show Database'), sg.Button('Clear Database')]]
+    column_2_layout = [[sg.Text('Action', justification='center', size=(40,1), key='S_A')],[sg.Text('↑', justification='center', size=(40,1))],[sg.Text('State Change', justification='center', size=(40,1), key='S_SC')],[sg.Text('↑', justification='center', size=(40,1))],[sg.Text('Phenomena', justification='center', size=(40,1), key='S_PH')],[sg.Text('↑', justification='center', size=(40,1))],[sg.Text('Physical effect', justification='center', size=(40,1), key='S_E')],[sg.Text('↗', justification='right', size=(15,1)),sg.Text('', justification='center', size=(10,1)),sg.Text('↖', justification='left', size=(15,1))],[sg.Text('Input', justification='center', size=(20,1), key='S_I'),sg.Text('oRgan', justification='center', size=(20,1), key='S_R')],[sg.Text('', justification='center', size=(20,1)),sg.Text('↑', justification='center', size=(20,1))],[sg.Text('', justification='center', size=(20,1)),sg.Text('Part', justification='center', size=(20,1), key='S_P')]]
+
+    calculate_layout = [[sg.Column(column_1_layout), sg.VSeperator(), sg.Column(column_2_layout)],[sg.Table(values = df1, headings = headings, auto_size_columns=True, justification='left', key = 'datatable')]]
 
     calculate_window = sg.Window('VariAnT v1.0', calculate_layout, modal=True)
 
     def clear_input():
         for key in values:
             calculate_window[key]('')
+            calculate_window['S_A'].update('Action')
+            calculate_window['S_SC'].update('State Change')
+            calculate_window['S_PH'].update('Phenomena')
+            calculate_window['S_E'].update('Physical effect')
+            calculate_window['S_R'].update('oRgan')
+            calculate_window['S_P'].update('Part')
+            calculate_window['S_I'].update('Input')
         return None
     def warning_window():
         warning_layout = [[sg.Text('Do you really want to delete these records? \nThis process cannot be undone')],[sg.Button('Cancel'), sg.Button('Delete', button_color='red')]]
@@ -80,6 +90,7 @@ def calculate_window(x,y):
             if event == sg.WIN_CLOSED or event == 'OK':
                 break
         sapphire_window.close()
+        
 
     def remove_duplicates(duplist):
         noduplist = []
@@ -111,8 +122,17 @@ def calculate_window(x,y):
                 new_record = pd.DataFrame(data=d, index=[0])
                 df = pd.concat([df, new_record], ignore_index=True)
                 df.to_excel(EXCEL_FILE, columns=['Concept ID','Instance ID','Action','State Change','Phenomena','Physical effect','oRgan','Part','Input'], index=False)
-                sapphire_window(values['Action'],values['State Change'],values['Phenomena'],values['Physical effect'],values['oRgan'],values['Part'],values['Input'])
-                clear_input()
+                #sapphire_window(values['Action'],values['State Change'],values['Phenomena'],values['Physical effect'],values['oRgan'],values['Part'],values['Input'])
+                df1=df.values.tolist()
+                calculate_window["datatable"].update(df1)
+                calculate_window['S_A'].update(values['Action'])
+                calculate_window['S_SC'].update(values['State Change'])
+                calculate_window['S_PH'].update(values['Phenomena'])
+                calculate_window['S_E'].update(values['Physical effect'])
+                calculate_window['S_R'].update(values['oRgan'])
+                calculate_window['S_P'].update(values['Part'])
+                calculate_window['S_I'].update(values['Input'])
+                
         if event == 'Calculate Variety':
             concept_list = list(df['Concept ID'])
             total_num_of_concepts = len(remove_duplicates(concept_list))
@@ -205,8 +225,8 @@ def calculate_window(x,y):
                 sg.popup('Invaid concept  space!', title='Error!')
         if event == 'Show Database':
             print(tabulate(df, headers = 'keys', tablefmt = 'psql', showindex=False))
-            #sg.PopupScrolled(df, size=(80,10))
-            database_window()
+            df1=df.values.tolist()
+            calculate_window["datatable"].update(df1)
         if event == 'Clear Database':
             warning_window()
     calculate_window.close()
