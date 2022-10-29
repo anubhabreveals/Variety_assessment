@@ -18,13 +18,16 @@ df = pd.read_excel(EXCEL_FILE)
 
 
 def create_bar_graph(y_axis, x_axis):
-    plt.figure(figsize=(5,4))
+    plt.figure(figsize=(4,3))
     plt.bar(x_axis, y_axis, color='teal')
-    plt.xlabel("Concept ID")
-    plt.ylabel("Variety Score")
-    plt.xticks(x_axis)
+    plt.title("The individual variety scores of each concept", fontsize=9)
+    plt.xlabel("Concept ID", fontsize=8)
+    plt.ylabel("Variety Score", fontsize=8)
+    plt.xticks(x_axis, fontsize=8)
+    plt.yticks(fontsize=8)
+    plt.subplots_adjust(bottom=0.15, right=0.98, top=0.9, left=0.15)
     for i in range(len(x_axis)):
-        plt.text(i+1, y_axis[i], round(y_axis[i],3), ha='center')
+        plt.text(i+1, y_axis[i], round(y_axis[i],3), ha='center', fontsize=8)
     return plt.gcf()
 
 def draw_figure_on_canvas(canvas, figure):
@@ -90,7 +93,9 @@ def calculate_window(x,y):
         warning_window.close()
 
     def score_window(x):
-        score_layout = [[sg.Text('Variety score of the concept space is:'),sg.Text(x, font=("Courier",15), text_color='Yellow')],[sg.Text('The individual variety scores of each concept are:')],[sg.Canvas(key='-CANVAS-')],[sg.Button('Close')]]
+        score_layout = [[sg.Text('Variety score of the concept space is:'),sg.Text(x, font=("Courier",15), text_color='Yellow')],
+        #[sg.Text('The individual variety scores of each concept are:')],
+        [sg.Canvas(key='-CANVAS-')],[sg.Button('Close')]]
 
         score_window = sg.Window('Results', score_layout, finalize=True, modal=True)
         draw_figure_on_canvas(score_window['-CANVAS-'].TKCanvas, create_bar_graph(v_i_list, concepts_number_list))
